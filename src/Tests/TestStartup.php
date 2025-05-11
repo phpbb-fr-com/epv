@@ -83,7 +83,7 @@ class TestStartup
 
 		$this->output->writeln(sprintf("Checkout %s from git on branch %s.", $git, $branch));
 		$tmpdir = sys_get_temp_dir();
-		$uniq   = $tmpdir . DIRECTORY_SEPARATOR . uniqid();
+		$uniq   = $tmpdir . DIRECTORY_SEPARATOR . uniqid('', true);
 
 		@mkdir($uniq);
 
@@ -130,7 +130,7 @@ class TestStartup
 	 */
 	private function printResults()
 	{
-		// Write a empty line
+		// Write an empty line
 		$this->output->writeLn('');
 
 		$found_msg = ' ';
