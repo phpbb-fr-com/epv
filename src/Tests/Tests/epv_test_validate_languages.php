@@ -79,7 +79,7 @@ class epv_test_validate_languages extends BaseTest
 					$keys = $this->load_language_keys($file);
 					$langs[$language][$relative_filename] = $keys;
 
-					$lang_keys = isset($expected_keys[$relative_filename]) ? $expected_keys[$relative_filename] : [];
+					$lang_keys = $expected_keys[$relative_filename] ?? [];
 					$expected_keys[$relative_filename] = array_unique(array_merge($lang_keys, $keys));
 				}
 				catch (Error $e)
