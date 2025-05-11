@@ -10,11 +10,9 @@
 
 namespace Phpbb\Epv\Tests\Tests;
 
-use Composer\Composer;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\Loader\InvalidPackageException;
 use Composer\Package\Loader\ValidatingArrayLoader;
-use Composer\Package\Version\VersionParser;
 use Phpbb\Epv\Files\FileInterface;
 use Phpbb\Epv\Files\Type\ComposerFileInterface;
 use Phpbb\Epv\Output\Output;
