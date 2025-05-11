@@ -290,10 +290,10 @@ class epv_test_validate_php_functions extends BaseTest
 	}
 
 	/**
-	 * Run validations on a Array of nodes. If a key contains a object or array, it will recursively call
+	 * Run validations on an Array of nodes. If a key contains an object or array, it will recursively call
 	 * parseNode on these objects or arrays.
 	 *
-	 * Because the structure of a php is dynamically, and we (of course) don't want to run this twice to discover the number
+	 * Because the structure of PHP is dynamic, and we (of course) don't want to run this twice to discover the number
 	 * of tests (Due to slowness), we dynamically increase the maximum progress. In a perfect world, we would do a testrun
 	 * first, and after that the real test.
 	 *
@@ -309,7 +309,7 @@ class epv_test_validate_php_functions extends BaseTest
 				if ($this->in_phpbb)
 				{
 					// IN_PHPBB was found, we continue.
-					// Do not remove this continue, because exit is required within IN_PHPBB,
+					// Do not remove this 'continue', because exit is required within IN_PHPBB,
 					// And if we will continue, it will add warnings about using exit.
 					// checkInDefined will make sure there are no other nodes within the check,
 					// and if there are any nodes it will call parseNode on these statements.
@@ -343,15 +343,15 @@ class epv_test_validate_php_functions extends BaseTest
 		}
 	}
 
-    /**
-     * Check if the current node checks for IN_PHPBB, and
-     * exits if it isn't defined.
-     *
-     * If IN_PHPBB is found, but there is no exit as first statement, it will not set IN_PHPBB, but will add a notice
-     * instead for the user.  The other nodes will be send back to parseNode.
-     *
-     * @param \PhpParser\Node\Stmt\If_ $node if node that checks possible for IN_PHPBB
-     */
+	/**
+	 * Check if the current node checks for IN_PHPBB, and
+	 * exits if it isn't defined.
+	 *
+	 * If IN_PHPBB is found, but there is no exit as first statement, it will not set IN_PHPBB, but will add a notice
+	 * instead for the user. The other nodes will be sent back to parseNode.
+	 *
+	 * @param \PhpParser\Node\Stmt\If_ $node if node that checks possible for IN_PHPBB
+	 */
 	private function checkInDefined(If_ $node)
 	{
 		$cond = $node->cond;
@@ -362,7 +362,6 @@ class epv_test_validate_php_functions extends BaseTest
 			&& $cond->expr->args[0]->value->value === 'IN_PHPBB'
 		)
 		{
-
 			if ($node->stmts[0]->expr instanceof Node\Expr\Exit_)
 			{
 				// Found IN_PHPBB
@@ -370,8 +369,8 @@ class epv_test_validate_php_functions extends BaseTest
 			}
 			else
 			{
-				// Found IN_PHPBB, but it didn't exists?
-				// We dont set $this->in_phpbb, so parseNode continue running on this node.
+				// Found IN_PHPBB, but it didn't exist?
+				// We don't set $this->in_phpbb, so parseNode continues running on this node.
 				// Also include a notice.
 				$this->addMessage(Output::NOTICE, 'IN_PHPBB check should exit if it is not defined');
 			}
@@ -384,11 +383,11 @@ class epv_test_validate_php_functions extends BaseTest
 		}
 	}
 
-    /**
-     * Do certain validations on function names.
-     *
-     * @param Node $node Node to validate
-     */
+	/**
+	 * Do certain validations on function names.
+	 *
+	 * @param Node $node Node to validate
+	 */
 	private function validateFunctionNames(Node $node)
 	{
 		$name = null;
@@ -407,19 +406,21 @@ class epv_test_validate_php_functions extends BaseTest
 			$this->validateDeprecated($name, $node);
 			$this->validateFunctions($name, $node);
 		}
-        $this->validateEval($node);
+		$this->validateEval($node);
 	}
 
 	/**
 	 * Validate method calls to classes.
+	 *
 	 * @param Node $node Node to validate
 	 */
-	private function validateMethodCalls(Node $node) {
+	private function validateMethodCalls(Node $node)
+	{
 		$name = null;
 		if ($node instanceof Node\Expr\MethodCall)
 		{
-            $name = $this->getMethodName($node);
-        }
+			$name = $this->getMethodName($node);
+		}
 		else if (isset($node->expr)
 			&& $node->expr instanceof Node\Expr\MethodCall
 			&& !($node->expr->name instanceof Variable
@@ -505,14 +506,14 @@ class epv_test_validate_php_functions extends BaseTest
 			return $node->name->toString();
 		}
 		return null;
-    }
+	}
 
-    /**
-     * Validate the use of enable_globals.
-     *
-     * @param $name
-     * @param Node $node
-     */
+	/**
+	 * Validate the use of enable_globals.
+	 *
+	 * @param      $name
+	 * @param Node $node
+	 */
 	private function validateEnableGlobals($name, Node $node)
 	{
 		if ($name == 'enable_super_globals')
@@ -522,12 +523,12 @@ class epv_test_validate_php_functions extends BaseTest
 	}
 
 	private function validateEval(Node $node)
-    {
-        if ($node instanceof Eval_)
-        {
-            $this->addMessage(Output::FATAL, sprintf('The use of eval() is not allowed for security reasons on line %s', $node->getAttribute('startLine')));
-        }
-    }
+	{
+		if ($node instanceof Eval_)
+		{
+			$this->addMessage(Output::FATAL, sprintf('The use of eval() is not allowed for security reasons on line %s', $node->getAttribute('startLine')));
+		}
+	}
 
 	/**
 	 * Validate the use of deprecated functions.
