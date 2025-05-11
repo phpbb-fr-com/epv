@@ -4,9 +4,10 @@
  * EPV :: The phpBB Forum Extension Pre Validator.
  *
  * @copyright (c) 2014 phpBB Limited <https://www.phpbb.com>
- * @license       GNU General Public License, version 2 (GPL-2.0)
+ * @license GNU General Public License, version 2 (GPL-2.0)
  *
  */
+
 namespace Phpbb\Epv\Tests\Tests;
 
 use Phpbb\Epv\Files\FileInterface;
@@ -40,25 +41,17 @@ use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\ParserFactory;
 
-
 class epv_test_validate_php_functions extends BaseTest
 {
-    /**
-     * @var \PhpParser\Parser
-     */
-	private $parser;
-
-	/** @var bool */
-	private $in_phpbb = true;
-
 	/**
 	 * Array with deprecated/removed functions.
 	 *
 	 * Key: old function name (Which is removed/deprecated)
 	 * Value: If available, new function name
+	 *
 	 * @var array
 	 */
-	private $deprecated = array(
+	private static $deprecated = [
 		'gen_email_hash'            => 'phpbb_email_hash($email)',
 		'cache_moderators'          => 'phpbb_cache_moderators($db, $cache, $auth)',
 		'update_foes'               => 'phpbb_update_foes($db, $auth, $group_id, $user_id)',
@@ -81,13 +74,14 @@ class epv_test_validate_php_functions extends BaseTest
 		'on_page'                   => 'phpbb_on_page($template, $user, $num_items, $per_page, $start)',
 		'remove_comments'           => 'phpbb_remove_comments($input)',
 		'remove_remarks'            => 'phpbb_remove_comments($input)',
-	);
+	];
 
 	/**
 	 * List of dbal functions that should not be called.
+	 *
 	 * @var array
 	 */
-	private $dbal = array(
+	private static $dbal = [
 		'mysql_',
 		'mysqli_',
 		'oci_',
@@ -98,7 +92,38 @@ class epv_test_validate_php_functions extends BaseTest
 		'sqlsrv_',
 		'ibase_',
 		'db2_',
-	);
+	];
+
+	/**
+	 * Disallowed function calls and their output level.
+	 */
+	private static $warn_functions = [
+		'exec'             => Output::ERROR,
+		'shell_exec'       => Output::ERROR,
+		'system'           => Output::ERROR,
+		'passthru'         => Output::ERROR,
+		'getenv'           => Output::ERROR,
+		'die'              => Output::ERROR,
+		'addslashes'       => Output::ERROR,
+		'stripslashes'     => Output::ERROR,
+		'htmlspecialchars' => Output::ERROR,
+		'include_once'     => Output::WARNING,
+		'require_once'     => Output::WARNING,
+		'md5'              => Output::NOTICE,
+		'sha1'             => Output::NOTICE,
+		'var_dump'         => Output::ERROR,
+		'print_r'          => Output::ERROR,
+		'printf'           => Output::ERROR,
+		'unserialize'      => Output::ERROR,
+	];
+
+	/**
+	 * @var \PhpParser\Parser
+	 */
+	private $parser;
+
+	/** @var bool */
+	private $in_phpbb = true;
 
 	/**
 	 * @param bool            $debug if debug is enabled
@@ -231,7 +256,6 @@ class epv_test_validate_php_functions extends BaseTest
 			$this->output->writelnIfDebug(sprintf('Did not find IN_PHPBB, but php file %s contains a namespace with just classes, interfaces, traits or is a test file.', $this->file->getSaveFilename()));
 		}
 	}
-
 
 	/**
 	 * Validate the structure of a php file.
@@ -509,51 +533,48 @@ class epv_test_validate_php_functions extends BaseTest
 	/**
 	 * Validate the use of deprecated functions.
 	 *
-	 * @param                 $name
+	 * @param      $name
 	 * @param Node $node
 	 */
 	private function validateDeprecated($name, Node $node)
 	{
-		foreach ($this->deprecated as $depName => $dep)
+		if (isset(self::$deprecated[$name]))
 		{
-			if ($name == $depName)
-			{
-				$useInstead = '';
-
-				if ($this->deprecated[$name])
-				{
-					$useInstead = sprintf(', you can use %s instead', $this->deprecated[$name]);
-				}
-
-				$this->addMessage(Output::WARNING, sprintf('Found a deprecated or removed function call to %s on line %s%s', $name, $node->getAttribute('startLine'), $useInstead));
-
-				return;
-			}
+			$useInstead = self::$deprecated[$name]
+				? sprintf(', you can use %s instead', self::$deprecated[$name])
+				: '';
+			$this->addMessage(
+				Output::WARNING,
+				sprintf(
+					'Found a deprecated or removed function call to %s on line %s%s',
+					$name,
+					$node->getAttribute('startLine'),
+					$useInstead
+				)
+			);
 		}
 	}
 
 	/**
 	 * Validate the use of non dbal names.
 	 *
-	 * @param string          $name function name
-	 * @param Node $node
+	 * @param string $name function name
+	 * @param Node   $node
 	 */
 	private function validateDbal($name, Node $node)
 	{
-		foreach ($this->dbal as $dbal)
+		foreach (self::$dbal as $dbal)
 		{
-			$length = strlen($dbal);
-
-			if (strlen($name) < $length)
+			if (strpos($name, $dbal) === 0)
 			{
-				continue;
-			}
-			$call = substr($name, 0, $length);
-
-			if ($call == $dbal)
-			{
-				$this->addMessage(Output::ERROR, sprintf('Found a disallowed call to %s on line %s. Please use the DBAL instead.', $name, $node->getAttribute('startLine')));
-
+				$this->addMessage(
+					Output::ERROR,
+					sprintf(
+						'Found a disallowed call to %s on line %s. Please use the DBAL instead.',
+						$name,
+						$node->getAttribute('startLine')
+					)
+				);
 				return;
 			}
 		}
@@ -588,39 +609,17 @@ class epv_test_validate_php_functions extends BaseTest
 	/**
 	 * Validate if a node uses certain functions that should not be used within phpBB.
 	 *
-	 * @param                 $name
+	 * @param      $name
 	 * @param Node $node Node to validate
 	 */
 	private function validateFunctions($name, Node $node)
 	{
-		$warn_array = array(
-			'exec'             => Output::ERROR,
-			'shell_exec'	   => Output::ERROR,
-			'system'           => Output::ERROR,
-			'passthru'         => Output::ERROR,
-			'getenv'           => Output::ERROR,
-			'die'              => Output::ERROR,
-			'addslashes'       => Output::ERROR,
-			'stripslashes'     => Output::ERROR,
-			'htmlspecialchars' => Output::ERROR,
-			'include_once'     => Output::WARNING,
-			'require_once'     => Output::WARNING,
-			'md5'              => Output::NOTICE,
-			'sha1'             => Output::NOTICE,
-			'var_dump'         => Output::ERROR,
-			'print_r'          => Output::ERROR,
-			'printf'           => Output::ERROR,
-			'unserialize'      => Output::ERROR,
-		);
-
-		foreach ($warn_array as $err => $level)
+		if (isset(self::$warn_functions[$name]))
 		{
-			if ($name == $err)
-			{
-				$this->addMessage($level, sprintf('Using %s on line %s', $err, $node->getAttribute('startLine')));
-
-				return;
-			}
+			$this->addMessage(
+				self::$warn_functions[$name],
+				sprintf('Using %s on line %s', $name, $node->getAttribute('startLine'))
+			);
 		}
 	}
 
@@ -654,5 +653,4 @@ class epv_test_validate_php_functions extends BaseTest
 	{
 		return 'Validate php structure and deprecated functions';
 	}
-
 }
