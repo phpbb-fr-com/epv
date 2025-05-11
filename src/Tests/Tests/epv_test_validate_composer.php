@@ -62,16 +62,33 @@ class epv_test_validate_composer extends BaseTest
 	 */
 	private function validateLicense(array $json)
 	{
-		$this->addMessageIfBooleanTrue(!isset($json['license']), Output::FATAL, 'The license key is missing');
-		$this->addMessageIfBooleanTrue(isset($json['license']) && $json['license'] === 'GPL-2.0', Output::WARNING, '"GPL-2.0" is a deprecated SPDX license identifier, use "GPL-2.0-only" instead.');
-		$this->addMessageIfBooleanTrue(isset($json['license']) && ($json['license'] !== 'GPL-2.0-only' && $json['license'] !== 'GPL-2.0'), Output::ERROR, 'It is required to use "GPL-2.0-only" as the license identifier. Other licenses are not allowed as per the extension database policies.');
+		if (!isset($json['license']))
+		{
+			$this->addMessageIfBooleanTrue(true, Output::FATAL, 'The license key is missing');
+			return;
+		}
+
+		if ($json['license'] === 'GPL-2.0')
+		{
+			$this->addMessageIfBooleanTrue(true, Output::WARNING, '"GPL-2.0" is a deprecated SPDX license identifier, use "GPL-2.0-only" instead.');
+		}
+		else if ($json['license'] !== 'GPL-2.0-only')
+		{
+			$this->addMessageIfBooleanTrue(true, Output::ERROR, 'It is required to use "GPL-2.0-only" as the license identifier. Other licenses are not allowed as per the extension database policies.');
+		}
 	}
 
 	private function validateName(array $json)
 	{
-		$this->addMessageIfBooleanTrue(!isset($json['name']), Output::FATAL, 'The name key is missing');
-		$this->addMessageIfBooleanTrue(isset($json['name']) && strpos($json['name'], '_') !== false, Output::FATAL, 'The namespace should not contain underscores');
-
+		if (!isset($json['name']))
+		{
+			$this->addMessageIfBooleanTrue(true, Output::FATAL, 'The name key is missing');
+			return;
+		}
+		if (strpos($json['name'], '_') !== false)
+		{
+			$this->addMessageIfBooleanTrue(true, Output::FATAL, 'The namespace should not contain underscores');
+		}
 	}
 
 	/**
