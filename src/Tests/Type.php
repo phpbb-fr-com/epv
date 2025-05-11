@@ -7,25 +7,25 @@
  * @license       GNU General Public License, version 2 (GPL-2.0)
  *
  */
-namespace Phpbb\Epv\Tests;
 
+namespace Phpbb\Epv\Tests;
 
 class Type
 {
 
-	const TYPE_COMPOSER = 1;
-	const TYPE_HTML = 2;
-	const TYPE_LANG = 4;
-	const TYPE_PHP = 8;
-	const TYPE_PLAIN = 16;
-	const TYPE_SERVICE = 32;
-	const TYPE_XML = 64;
-	const TYPE_YML = 128;
-	const TYPE_JSON = 256;
-	const TYPE_BINARY = 512;
-	const TYPE_CSS = 1024;
-	const TYPE_JS = 2048;
-	const TYPE_LOCK = 4096;
-	const TYPE_ROUTING = 8192;
-	const TYPE_MIGRATION = 16384;
+	public const TYPE_COMPOSER = 1;
+	public const TYPE_HTML = 2;
+	public const TYPE_LANG = 4;
+	public const TYPE_PHP = 8;
+	public const TYPE_PLAIN = 16;
+	public const TYPE_SERVICE = 32;
+	public const TYPE_XML = 64;
+	public const TYPE_YML = 128;
+	public const TYPE_JSON = 256;
+	public const TYPE_BINARY = 512;
+	public const TYPE_CSS = 1024;
+	public const TYPE_JS = 2048;
+	public const TYPE_LOCK = 4096;
+	public const TYPE_ROUTING = 8192;
+	public const TYPE_MIGRATION = 16384;
 }
