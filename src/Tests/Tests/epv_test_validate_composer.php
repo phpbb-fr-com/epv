@@ -99,12 +99,17 @@ class epv_test_validate_composer extends BaseTest
 		if (isset($json['extra']['soft-require']['phpbb/phpbb']))
 		{
 			// https://github.com/phpbb/customisation-db/blob/3.1.x/contribution/extension/type.php#L296
+			$constraint = $json['extra']['soft-require']['phpbb/phpbb'];
 			$regex = '/(<|<=|~|\^|>|>=)([0-9]+(\.[0-9]+)?)\.[*x]/';
 
-			if (preg_match($regex, $json['extra']['soft-require']['phpbb/phpbb']))
+			if (preg_match($regex, $constraint))
 			{
-				$replace = preg_replace($regex, '$1$2', $json['extra']['soft-require']['phpbb/phpbb']);;
-				$this->addMessageIfBooleanTrue(true, Output::ERROR, sprintf('An invalid version constraint is used in soft-require: phpbb/phpbb. You can\'t combine a <|<=|~|\^|>|>= with a *|x. Please replace %s with %s', $json['extra']['soft-require']['phpbb/phpbb'], $replace));
+				$replace = preg_replace($regex, '$1$2', $constraint);
+				$this->addMessageIfBooleanTrue(true, Output::ERROR, sprintf(
+					'An invalid version constraint is used in soft-require: phpbb/phpbb. You can\'t combine a <|<=|~|\^|>|>= with a *|x. Please replace %s with %s',
+					$constraint,
+					$replace
+				));
 			}
 		}
 
