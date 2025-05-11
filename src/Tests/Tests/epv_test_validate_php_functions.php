@@ -264,7 +264,7 @@ class epv_test_validate_php_functions extends BaseTest
 	 */
 	private function parseNodes(array $nodes)
 	{
-		if (!($nodes[0] instanceof Namespace_))
+		if (!isset($nodes[0]) || !($nodes[0] instanceof Namespace_))
 		{
 			foreach ($nodes as $node)
 			{
