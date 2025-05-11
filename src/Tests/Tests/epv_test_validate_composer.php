@@ -7,6 +7,7 @@
  * @license       GNU General Public License, version 2 (GPL-2.0)
  *
  */
+
 namespace Phpbb\Epv\Tests\Tests;
 
 use Composer\Composer;
@@ -24,7 +25,6 @@ use Phpbb\Epv\Tests\Type;
 
 class epv_test_validate_composer extends BaseTest
 {
-
 	public function __construct($debug, OutputInterface $output, $basedir, $namespace, $titania, $opendir)
 	{
 		parent::__construct($debug, $output, $basedir, $namespace, $titania, $opendir);
@@ -43,45 +43,42 @@ class epv_test_validate_composer extends BaseTest
 		{
 			throw new TestException('This test expects a php type, but found something else.');
 		}
-		if (!$file->getJson() || !is_array($file->getJson()))
+		$json = $file->getJson();
+		if (!$json || !is_array($json))
 		{
 			throw new TestException('Parsing composer file failed');
 		}
 		$this->file = $file;
 
-		$this->validateName($file);
-		$this->validateLicense($file);
-		$this->validateVersion($file);
+		$this->validateName($json);
+		$this->validateLicense($json);
+		$this->validateVersion($json);
 	}
 
 	/**
 	 * Validate if the provided license is the GPL.
 	 *
-	 * @param \Phpbb\Epv\Files\Type\ComposerFileInterface $file
+	 * @param array $json
 	 */
-	private function validateLicense(ComposerFileInterface $file)
+	private function validateLicense(array $json)
 	{
-		$json = $file->getJson();
 		$this->addMessageIfBooleanTrue(!isset($json['license']), Output::FATAL, 'The license key is missing');
 		$this->addMessageIfBooleanTrue(isset($json['license']) && $json['license'] === 'GPL-2.0', Output::WARNING, '"GPL-2.0" is a deprecated SPDX license identifier, use "GPL-2.0-only" instead.');
 		$this->addMessageIfBooleanTrue(isset($json['license']) && ($json['license'] !== 'GPL-2.0-only' && $json['license'] !== 'GPL-2.0'), Output::ERROR, 'It is required to use "GPL-2.0-only" as the license identifier. Other licenses are not allowed as per the extension database policies.');
 	}
 
-	private function validateName(ComposerFileInterface $file)
+	private function validateName(array $json)
 	{
-		$json = $file->getJson();
 		$this->addMessageIfBooleanTrue(!isset($json['name']), Output::FATAL, 'The name key is missing');
 		$this->addMessageIfBooleanTrue(isset($json['name']) && strpos($json['name'], '_') !== false, Output::FATAL, 'The namespace should not contain underscores');
 
 	}
 
 	/**
-	 * @param ComposerFileInterface $file
+	 * @param array $json
 	 */
-	private function validateVersion(ComposerFileInterface $file)
+	private function validateVersion(array $json)
 	{
-		$json = $file->getJson();
-
 		if (isset($json['extra']['soft-require']['phpbb/phpbb']))
 		{
 			// https://github.com/phpbb/customisation-db/blob/3.1.x/contribution/extension/type.php#L296
@@ -95,7 +92,8 @@ class epv_test_validate_composer extends BaseTest
 		}
 
 		$parser = new ValidatingArrayLoader(new ArrayLoader(), true, null, ValidatingArrayLoader::CHECK_ALL);
-		try {
+		try
+		{
 			$parser->load($json);
 		}
 		catch (InvalidPackageException $exception)
@@ -109,14 +107,16 @@ class epv_test_validate_composer extends BaseTest
 	 * Add a array of errors as error into the report
 	 *
 	 * @param array $errorList
-	 * @param int $type
+	 * @param int   $type
 	 */
 	private function handleMessages(array $errorList, $type = Output::ERROR)
 	{
-		foreach ($errorList as $error) {
+		foreach ($errorList as $error)
+		{
 			$this->output->addMessage($type, 'Composer validation: ' . $error);
 		}
 	}
+
 	private function addMessageIfBooleanTrue($addMessage, $type, $message)
 	{
 		if ($addMessage)
@@ -129,5 +129,4 @@ class epv_test_validate_composer extends BaseTest
 	{
 		return "Validate composer structure";
 	}
-
 }
