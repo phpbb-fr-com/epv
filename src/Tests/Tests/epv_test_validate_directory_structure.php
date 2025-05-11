@@ -16,8 +16,6 @@ use Phpbb\Epv\Tests\TestRunner;
 
 class epv_test_validate_directory_structure extends BaseTest
 {
-	private $strict = false;
-
 	const LICENSE_SIMILARITY_THRESHOLD = 0.99;
 
 	const LICENSE_CLOSING_WORDS = 'END OF TERMS AND CONDITIONS';
