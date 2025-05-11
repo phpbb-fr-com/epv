@@ -439,16 +439,16 @@ class epv_test_validate_php_functions extends BaseTest
 		}
 	}
 
-    /**
-     * @param FuncCall|Expr\MethodCall $node
-     * @return null|string
-     */
-    private function getMethodName(Node $node)
-    {
-        if ($node->name instanceof Variable || $node->name instanceof PropertyFetch || $node->name instanceof ArrayDimFetch)
-        {
-            return null; // This is a variable. We are going to ignore this. We do not want to track variable contents
-        }
+	/**
+	 * @param FuncCall|Expr\MethodCall $node
+	 * @return null|string
+	 */
+	private function getMethodName(Node $node)
+	{
+		if ($node->name instanceof Variable || $node->name instanceof PropertyFetch || $node->name instanceof ArrayDimFetch)
+		{
+			return null; // This is a variable. We are going to ignore this. We do not want to track variable contents
+		}
 
 		if ($node->name instanceof Concat)
 		{
@@ -500,7 +500,7 @@ class epv_test_validate_php_functions extends BaseTest
 		{
 			return $node->name->getFirst();
 		}
-		else
+		else if (method_exists($node->name, 'toString'))
 		{
 			return $node->name->toString();
 		}
