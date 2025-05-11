@@ -337,7 +337,7 @@ class epv_test_validate_php_functions extends BaseTest
 					}
 					else
 					{
-						$this->parseNode(array($nr));
+						$this->parseNode([$nr]);
 					}
 				}
 			}
