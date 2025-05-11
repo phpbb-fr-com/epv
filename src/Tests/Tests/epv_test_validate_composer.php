@@ -82,7 +82,7 @@ class epv_test_validate_composer extends BaseTest
 	{
 		$json = $file->getJson();
 
-		if (isset($json['extra']) && isset($json['extra']['soft-require']) && isset($json['extra']['soft-require']['phpbb/phpbb']))
+		if (isset($json['extra']['soft-require']['phpbb/phpbb']))
 		{
 			// https://github.com/phpbb/customisation-db/blob/3.1.x/contribution/extension/type.php#L296
 			$regex = '/(<|<=|~|\^|>|>=)([0-9]+(\.[0-9]+)?)\.[*x]/';
