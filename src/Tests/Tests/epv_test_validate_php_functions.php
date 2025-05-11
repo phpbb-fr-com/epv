@@ -218,7 +218,7 @@ class epv_test_validate_php_functions extends BaseTest
 			foreach ($stmt[0]->stmts as $st)
 			{
 				if (!($st instanceof Class_ || $st instanceof Interface_ || $st instanceof Use_ || $st instanceof Declare_ || $st instanceof Trait_))
-				{ // Statement is a class, interface, trait or a Use classname.
+				{ // Statement is not a class, interface, trait or a Use classname.
 					$ok = false;
 					break;
 				}
