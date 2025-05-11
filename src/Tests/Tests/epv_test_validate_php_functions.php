@@ -194,14 +194,12 @@ class epv_test_validate_php_functions extends BaseTest
 	}
 
 	/**
-	 * Check if the missing IN_PHPBB is a valid one
+	 * Check if the missing IN_PHPBB is valid
 	 *
 	 * @param array $stmt Statements in this file.
 	 */
 	private function checkInPhpBB(array $stmt)
 	{
-		$ok = true;
-
 		foreach ($stmt as $key => $statement)
 		{
 			if ($statement instanceof Declare_)
@@ -214,21 +212,22 @@ class epv_test_validate_php_functions extends BaseTest
 		$stmt = array_values($stmt);
 
 		// Lets see if there is just a namespace + class
-		if (count($stmt) == 1 && $stmt[0] instanceof Namespace_)
+		$ok = true;
+		if (count($stmt) === 1 && $stmt[0] instanceof Namespace_)
 		{
 			foreach ($stmt[0]->stmts as $st)
 			{
-				if ($st instanceof Class_ || $st instanceof Interface_ || $st instanceof Use_ || $st instanceof Declare_ || $st instanceof Trait_)
+				if (!($st instanceof Class_ || $st instanceof Interface_ || $st instanceof Use_ || $st instanceof Declare_ || $st instanceof Trait_))
 				{ // Statement is a class, interface, trait or a Use classname.
-					continue;
+					$ok = false;
+					break;
 				}
-				$ok = false;
 			}
 		}
 		else
 		{
 			// First statement is not a namespace.
-			// We require a IN_PHPBB in all non namespaced files.
+			// We require a IN_PHPBB in all non-namespaced files.
 			$ok = false;
 		}
 
