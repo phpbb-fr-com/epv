@@ -7,6 +7,7 @@
  * @license       GNU General Public License, version 2 (GPL-2.0)
  *
  */
+
 namespace Phpbb\Epv\Tests\Tests;
 
 use Phpbb\Epv\Output\Output;
@@ -16,9 +17,8 @@ use Phpbb\Epv\Tests\TestRunner;
 
 class epv_test_validate_directory_structure extends BaseTest
 {
-	const LICENSE_SIMILARITY_THRESHOLD = 0.99;
-
-	const LICENSE_CLOSING_WORDS = 'END OF TERMS AND CONDITIONS';
+	public const LICENSE_SIMILARITY_THRESHOLD = 0.99;
+	public const LICENSE_CLOSING_WORDS = 'END OF TERMS AND CONDITIONS';
 
 	public function __construct($debug, OutputInterface $output, $basedir, $namespace, $titania, $opendir)
 	{
