@@ -138,11 +138,11 @@ class epv_test_validate_directory_structure extends BaseTest
 	}
 
 	/**
-	 * Sørensen–Dice coefficient, case sensitive
+	 * Sørensen–Dice coefficient, case sensitive.
 	 *
 	 * @param string $str1
 	 * @param string $str2
-	 * @return float a value between 0 and 1, 1 being exact match
+	 * @return float Value between 0 and 1, 1 means exact match
 	 */
 	protected function diceCoefficient($str1, $str2)
 	{
@@ -151,12 +151,12 @@ class epv_test_validate_directory_structure extends BaseTest
 
 		if ($str1 === $str2)
 		{
-			return 1;
+			return 1.0;
 		}
 
 		if (!strlen($str1) || !strlen($str2))
 		{
-			return 0;
+			return 0.0;
 		}
 
 		$bi1 = $this->bigrams($str1);
@@ -165,9 +165,7 @@ class epv_test_validate_directory_structure extends BaseTest
 		sort($bi1);
 		sort($bi2);
 
-		$i = 0;
-		$j = 0;
-		$matches = 0;
+		$i = $j = $matches = 0;
 		$len1 = count($bi1);
 		$len2 = count($bi2);
 
@@ -175,7 +173,7 @@ class epv_test_validate_directory_structure extends BaseTest
 		{
 			$cmp = strcmp($bi1[$i], $bi2[$j]);
 
-			if ($cmp == 0)
+			if ($cmp === 0)
 			{
 				$matches += 2;
 				$i++;
@@ -191,17 +189,22 @@ class epv_test_validate_directory_structure extends BaseTest
 			}
 		}
 
-		return $matches / ($len1 + $len2);
+		return ($len1 + $len2) > 0 ? $matches / ($len1 + $len2) : 0.0;
 	}
 
 	/**
-	 * @param $str
+	 * @param string $str
 	 * @return array
 	 */
 	protected function bigrams($str)
 	{
 		$bigrams = [];
 		$len = strlen($str);
+
+		if ($len < 2)
+		{
+			return $bigrams;
+		}
 
 		for ($i = 0; $i < $len - 1; $i++)
 		{
